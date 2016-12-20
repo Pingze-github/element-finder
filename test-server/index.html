@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <title>Inject-piper</title>
+        <style>
+            #drag{
+                width:50px;
+                height:50px;
+                background:green;
+                position:absolute;
+                top:100px;
+                left:100px;
+                opacity:0.5;
+            }
+            #switch{
+                width:50px;
+                height:50px;
+                background:green;
+                position:absolute;
+                top:300px;
+                left:250px;
+                opacity:0.5;
+            }
+            #main{
+                margin-top:120px;
+                width:80%;
+                margin-left:10%;
+                margin-right:10%;
+                background-color:#ccffff;
+            }
+            #title{
+                margin-top:30px;
+                margin:auto;
+                font-size:50px;
+                text-align:center;
+            }
+            #href{
+                margin-top:30px;
+                margin-bottom:30px;
+                margin-left:10%;
+                margin-right:10%;
+                width:80%;
+                height:40px;
+                line-height:32px;
+                font-size:32px;
+            }
+            #submit{
+                display:block;
+                width:80px;
+                height:40px;
+                margin:0 auto;
+                text-align:center;
+            }
+            #top,#bottom{
+                height:30px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="drag"></div>
+        <div id="switch"></div>
+        <div id="main">
+            <div id="top"></div>
+            <div id="title">Inject-piper</div>
+            <input type="text" id="href" />
+            <input type="submit" id="submit" />
+            <div id="bottom"></div>
+            <script type="text/javascript" src="jquery.min.js"></script>
+        </div>
+        <script type="text/javascript">
+            $('input#submit').click(function(){
+                var href = "/piper?href="+$('input#href').val();
+                location.href = href;
+            });
+        </script>
+
+        <script type="text/javascript">
+
+            function dragable(ele){
+                var clicked = false;
+                var mausx = "0";
+                var mausy = "0";
+                var winx = "0";
+                var winy = "0";
+                var difx = "0";
+                var dify = "0";
+                if (ele.css('position')!='absolute'){
+                    ele.css('position','absolute');
+                }
+                $("html").mousemove(function (event) {
+                    mausx = event.pageX;
+                    mausy = event.pageY;
+                    winx = ele.offset().left;
+                    winy = ele.offset().top;
+                    if (clicked == false) {
+                        difx = mausx - winx;
+                        dify = mausy - winy;
+                    }
+                    var newx = event.pageX - difx - ele.css("marginLeft").replace('px', '');
+                    var newy = event.pageY - dify - ele.css("marginTop").replace('px', '');
+                    ele.css({ top: newy, left: newx });
+                });
+
+                ele.mousedown(function (event) {
+                    clicked = true;
+                });
+                ele.mouseup(function (event) {
+                    clicked = false;
+                });
+            }
+            dragable($('#drag'));
+
+            $('#drag').click(function(){ //检测不到finding状态的#drag.click，因为正在穿透
+                var ele = $(this);
+                setTimeout(function(){
+                    ele.css('pointer-events','none');
+                    ele.css('background','red');
+                },100);
+                setTimeout(function(){
+                    ele.css('pointer-events','auto');
+                    ele.css('background','green');
+                },1000);
+            });
+            $('*').click(function(event){
+                event.stopPropagation();
+                if ($(this)[0]!=$('#drag')[0]){
+                    //console.log($(this).prop('outerHTML').replace(/\n/g,'').replace(/\s+/g,' ').substr(0,50));
+                    $('#drag').css('pointer-events','auto');
+                    $('#drag').css('background','green');
+                    //alert($(this).prop('outerHTML').replace(/\n/g,'').replace(/\s+/g,' ').substr(0,50));
+                }
+            });
+            $('*').mouseup(function(event){
+                event.stopPropagation();
+                if ($(this)[0]!=$('#drag')[0]){
+                    console.log('mouseup')
+                    console.log($(this).prop('outerHTML').replace(/\n/g,'').replace(/\s+/g,' ').substr(0,50));
+                    //alert($(this).prop('outerHTML').replace(/\n/g,'').replace(/\s+/g,' ').substr(0,50));
+                }
+            });
+
+            $('#switch').mousedown(function(){
+                $(this).css('pointer-events','none');
+            });
+
+/*            function detect(ele){
+                ele.click(){
+                    $('*').click(function(event){
+                        event.stopPropagation();
+                        console.log($(this).prop('outerHTML').replace(/\n/g,'').replace(/\s+/g,' '));
+                    });
+                }
+            }*/
+            /*
+            1.做成开关式，打开开关后，封闭事件，点击任意位置，显示NODE，同时开关关闭，恢复事件。
+                不可能恢复解除绑定的事件。
+            2.做成拖动式，只检查探测器位置的NODE，利用mouseup。
+                按下 - 穿透 - 弹起 ,监听弹起事件
+                这个可行！
+            */
+        </script>
+    </body>
+</html>
+
