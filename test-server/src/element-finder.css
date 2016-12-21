@@ -5,6 +5,7 @@
     top:349px;
     left:484px;
     opacity:0.5;
+    z-index:1024;
 }
 .element-finder-off{
     background:green;

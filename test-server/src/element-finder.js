@@ -52,7 +52,7 @@ function switch_register(ele_id){
         var uppos = [event.pageX,event.pageY];
         if (downing){
             if(uppos.toString()==downpos.toString()){//click
-                //console.log('on')
+                console.log('on')
                 ele.css('pointer-events','none');
                 ele.removeClass(class_off).addClass(class_on);
                 switch_on = true;
@@ -95,17 +95,21 @@ function switch_register(ele_id){
     function bindClickShow(){
         ele_others.click(function(event){
             event.stopPropagation(); //stop event's propagation
-            event.preventDefault(); //stop default eventHandlers
+            //event.preventDefault(); //stop default eventHandlers, but not recover itself.
             if (switch_on && $(this)[0]!=ele.parent()[0]){
                 pos = [event.pageX,event.pageY];
                 if (!posOnEle(pos,ele)){
                     console.log($(this).prop('outerHTML').replace(/\n/g,'').replace(/\s+/g,' ').substr(0,50));
+
+                    selector.select($(this)); //func of element-selector
+
                 }
                 ele.css('pointer-events','auto');
                 ele.removeClass(class_on).addClass(class_off);
                 switch_on = false;
                 rebindAllUserClickEvents()
-                //console.log('off')
+                console.log('off')
+                return false; //stop default eventHandlers
             }
         });
     }
